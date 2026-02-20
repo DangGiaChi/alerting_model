@@ -12,6 +12,7 @@ from sklearn.metrics import (
 import joblib
 import os
 from train import create_sliding_windows, add_statistical_features
+from sklearn.model_selection import train_test_split
 
 
 def evaluate_model(model, scaler, X_test, y_test): 
@@ -189,7 +190,6 @@ def analyze_feature_importance(model, window_size):
 
 
 def main():
-    print("Loading model...")
     model = joblib.load('models/incident_model.pkl')
     scaler = joblib.load('models/scaler.pkl')
     config = joblib.load('models/model_config.pkl')
@@ -197,13 +197,11 @@ def main():
     print(f"Window size: {config['window_size']}")
     print(f"Prediction horizon: {config['horizon']}")
     
-    print("\nLoading test data...")
     df = pd.read_csv('timeseries_data.csv')
     
     X, y = create_sliding_windows(df, config['window_size'], config['horizon'])
     X_enhanced = add_statistical_features(X, config['window_size'])
     
-    from sklearn.model_selection import train_test_split
     _, X_test, _, y_test = train_test_split(
         X_enhanced, y, test_size=0.2, random_state=42, stratify=y
     )
