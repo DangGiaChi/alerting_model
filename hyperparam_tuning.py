@@ -8,6 +8,7 @@ import joblib
 import os
 import time
 from train import create_sliding_windows, add_statistical_features
+import sys
 
 WINDOW_SIZE = 50
 HORIZON = 10
@@ -123,9 +124,11 @@ def compare_with_baseline():
 
 
 if __name__ == "__main__":
-    import sys
-
-    df = pd.read_csv('timeseries_data.csv')
+    try:
+        df = pd.read_csv('timeseries_data.csv')
+    except FileNotFoundError:
+        print("timeseries_data.csv not found. Maybe you forgot to run generate_data.py first?")
+        sys.exit(1)
     
     if len(sys.argv) > 1:
         n_iter = int(sys.argv[1])

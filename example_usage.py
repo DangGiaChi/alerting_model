@@ -1,13 +1,18 @@
 import numpy as np
 import pandas as pd
 import joblib
+import sys
 from sklearn.model_selection import train_test_split
 from train import add_statistical_features, create_sliding_windows
 
 def load_model():
-    model = joblib.load('models/incident_model.pkl')
-    scaler = joblib.load('models/scaler.pkl')
-    config = joblib.load('models/model_config.pkl')
+    try:
+        model = joblib.load('models/incident_model.pkl')
+        scaler = joblib.load('models/scaler.pkl')
+        config = joblib.load('models/model_config.pkl')
+    except FileNotFoundError:
+        print("Model files not found. Maybe you forgot to run train.py first?")
+        sys.exit(1)
     return model, scaler, config
 
 
@@ -49,7 +54,11 @@ def main():
     print("Loading trained model...\n")
     model, scaler, config = load_model()
     
-    df = pd.read_csv('timeseries_data.csv')
+    try:
+        df = pd.read_csv('timeseries_data.csv')
+    except FileNotFoundError:
+        print("timeseries_data.csv not found. Maybe you forgot to run generate_data.py first?")
+        sys.exit(1)
     
     test_indices = get_test_set_indices(df, config)
     print(f"Using only test set data ({len(test_indices)} windows from unseen data)\n")

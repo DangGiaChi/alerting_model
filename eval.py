@@ -11,6 +11,7 @@ from sklearn.metrics import (
 )
 import joblib
 import os
+import sys
 from train import create_sliding_windows, add_statistical_features
 from sklearn.model_selection import train_test_split
 
@@ -190,14 +191,22 @@ def analyze_feature_importance(model, window_size):
 
 
 def main():
-    model = joblib.load('models/incident_model.pkl')
-    scaler = joblib.load('models/scaler.pkl')
-    config = joblib.load('models/model_config.pkl')
+    try:
+        model = joblib.load('models/incident_model.pkl')
+        scaler = joblib.load('models/scaler.pkl')
+        config = joblib.load('models/model_config.pkl')
+    except FileNotFoundError:
+        print("Model files not found. Maybe you forgot to run train.py first?")
+        sys.exit(1)
     
     print(f"Window size: {config['window_size']}")
     print(f"Prediction horizon: {config['horizon']}")
     
-    df = pd.read_csv('timeseries_data.csv')
+    try:
+        df = pd.read_csv('timeseries_data.csv')
+    except FileNotFoundError:
+        print("timeseries_data.csv not found. Maybe you forgot to run generate_data.py first?")
+        sys.exit(1)
     
     X, y = create_sliding_windows(df, config['window_size'], config['horizon'])
     X_enhanced = add_statistical_features(X, config['window_size'])

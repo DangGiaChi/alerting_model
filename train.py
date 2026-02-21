@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import joblib
 import os
+import sys
 
 WINDOW_SIZE = 50
 HORIZON = 10
@@ -144,7 +145,11 @@ def train_model(df, window_size=50, horizon=10):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('timeseries_data.csv')
+    try:
+        df = pd.read_csv('timeseries_data.csv')
+    except FileNotFoundError:
+        print("timeseries_data.csv not found. Maybe you forgot to run generate_data.py first?")
+        sys.exit(1)
     
     model, scaler, X_test, y_test = train_model(
         df, 
