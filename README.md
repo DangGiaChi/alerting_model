@@ -4,6 +4,13 @@
 
 A machine learning system that predicts whether an incident will occur within the next H time steps based on the previous W steps of time-series metrics using Random Forest with sliding window approach.
 
+## Highlights
+
+- **98.4% accuracy** with 92% precision and 90% recall on test set
+- **Random Forest chosen for interpretability** over Deep Learning/LSTM ([Why Random Forest](#design-decisions))
+- **Sliding window approach** transforms time series prediction into classification problem
+- **Adjustable thresholds** enable tuning between incident detection (recall) and false alarm reduction (precision)
+
 ## Files
 
 - **generate_data.py**: Generates synthetic time series data with incident patterns and noise
@@ -223,3 +230,21 @@ This demonstrates how adjustable thresholds allow operators to tune sensitivity 
 
 > **Adapting for Production**  
 > For real alerting systems, the model would process streaming metrics in real-time, maintaining a sliding window buffer and generating predictions every time step. Alerts would be triggered when probability exceeds the configured threshold, with context including confidence scores and top contributing features. The system would need periodic retraining with labeled incident data and continuous monitoring of precision/recall to detect model degradation over time.
+
+## Key Takeaways
+
+**1. Problem formulation matters more than model complexity**
+
+The sliding window approach with simple features (raw values + basic statistics) achieves strong performance with Random Forest. This might suggest that thoughtful problem formulation can be more impactful than using complex deep learning models.
+
+**2. Interpretability enables operational decisions**
+
+Random Forest's explainability allows operators to understand *why* an alert was raised (which features contributed most). This transparency is crucial for production systems where teams need to trust and act on predictions, not just receive black-box scores.
+
+**3. Threshold tuning depending objectives**
+
+The threshold trade-off needs to be considered in production, catching more incidents (lower threshold) vs. reducing alert fatigue (higher threshold). This flexibility allows the same model to adapt to different operational contexts and risk tolerances.
+
+**4. Synthetic data only serves to validate approach, real data still needed**
+
+While the exceptionally high metrics (AUC ~0.995) validate that the approach works, they also indicate the synthetic data is too simple. Real production deployment would require: training on actual incident data with its messier patterns and continuous monitoring for model degradation.
